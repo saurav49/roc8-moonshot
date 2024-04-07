@@ -3,13 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-import { z } from "zod";
-
-const loginFormSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(4).max(20),
-});
+import { loginFormSchema } from "~/lib/schema";
+import { type z } from "zod";
 export type LoginFormFields = z.infer<typeof loginFormSchema>;
+
 function Login() {
   const {
     register,
@@ -23,14 +20,14 @@ function Login() {
   };
   const [isShowPass, setIsShowPass] = React.useState<boolean>(false);
   return (
-    <div className="border-gray flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border px-[60px] py-10">
-      <h1 className="font-inter mb-8 text-3xl font-semibold text-black">
+    <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+      <h1 className="mb-8 font-inter text-3xl font-semibold text-black">
         Login
       </h1>
       <h2 className="font-inter text-2xl font-medium text-black">
         Welcome back to ECOMMERCE
       </h2>
-      <p className="font-inter mb-[31px] mt-[13px] text-base font-normal text-black">
+      <p className="mb-[31px] mt-[13px] font-inter text-base font-normal text-black">
         The next gen business marketplace
       </p>
       <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -46,11 +43,11 @@ function Login() {
             type="email"
             id="email"
             placeholder="Enter email"
-            className="border-gray placeholder:font-inter w-full rounded-md border p-4"
+            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
             {...register("email")}
           />
           {errors.email && (
-            <small className="text-error text-center text-base font-normal">
+            <small className="text-center text-base font-normal text-error">
               {errors.email.message}
             </small>
           )}
@@ -67,7 +64,7 @@ function Login() {
             type={isShowPass ? "text" : "password"}
             id="password"
             placeholder="Enter password"
-            className="border-gray placeholder:font-inter w-full rounded-md border p-4"
+            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
             {...register("password")}
           />
           <button
@@ -77,7 +74,7 @@ function Login() {
             Show
           </button>
           {errors.password && (
-            <small className="text-error text-center text-base font-normal">
+            <small className="text-center text-base font-normal text-error">
               {errors.password.message}
             </small>
           )}
@@ -89,14 +86,14 @@ function Login() {
           {isSubmitting ? <span>Loading...</span> : <span>Create account</span>}
         </button>
       </form>
-      <div className="bg-gray mb-[31px] mt-[29px] h-1 w-full"></div>
+      <div className="mb-[31px] mt-[29px] h-1 w-full bg-gray"></div>
       <div className="flex items-center text-base">
-        <p className="text-darkcharcoal font-inter mr-[11px] font-normal">
+        <p className="mr-[11px] font-inter font-normal text-darkcharcoal">
           Don&apos;t have an Account ?
         </p>
         <button
           type="button"
-          className="font-inter cursor-pointer font-medium uppercase text-black"
+          className="cursor-pointer font-inter font-medium uppercase text-black"
         >
           sign up
         </button>

@@ -1,14 +1,11 @@
 "use client";
 import React from "react";
-import { z } from "zod";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-const signupFormSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  password: z.string().min(4).max(20),
-});
+import { signupFormSchema } from "~/lib/schema";
+import { type z } from "zod";
+
 export type SingupFormFields = z.infer<typeof signupFormSchema>;
 function Signup() {
   const {
@@ -22,8 +19,8 @@ function Signup() {
     console.log(data);
   };
   return (
-    <div className="border-gray flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border px-[60px] py-10">
-      <h1 className="font-inter mb-8 text-3xl font-semibold">
+    <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+      <h1 className="mb-8 font-inter text-3xl font-semibold">
         Create your account
       </h1>
       <form onSubmit={handleSubmit(onFormSubmit)} className="mb-12">
@@ -39,11 +36,11 @@ function Signup() {
             type="text"
             id="name"
             placeholder="Enter name"
-            className="border-gray placeholder:font-inter w-full rounded-md border p-4"
+            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
             {...register("name")}
           />
           {errors.name && (
-            <small className="text-error text-center text-base font-normal">
+            <small className="text-center text-base font-normal text-error">
               {errors.name.message}
             </small>
           )}
@@ -60,11 +57,11 @@ function Signup() {
             type="email"
             id="email"
             placeholder="Enter email"
-            className="border-gray placeholder:font-inter w-full rounded-md border p-4"
+            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
             {...register("email")}
           />
           {errors.email && (
-            <small className="text-error text-center text-base font-normal">
+            <small className="text-center text-base font-normal text-error">
               {errors.email.message}
             </small>
           )}
@@ -81,29 +78,29 @@ function Signup() {
             type="password"
             id="password"
             placeholder="Enter password"
-            className="border-gray placeholder:font-inter w-full rounded-md border p-4"
+            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
             {...register("password")}
           />
           {errors.password && (
-            <small className="text-error text-center text-base font-normal">
+            <small className="text-center text-base font-normal text-error">
               {errors.password.message}
             </small>
           )}
         </div>
         <button
           type="submit"
-          className="font-inter mt-10 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center text-base font-medium uppercase text-white"
+          className="mt-10 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center font-inter text-base font-medium uppercase text-white"
         >
           {isSubmitting ? <span>Loading...</span> : <span>Create account</span>}
         </button>
       </form>
       <div className="flex items-center text-base">
-        <p className="text-darkcharcoal font-inter mr-[11px] font-normal">
+        <p className="mr-[11px] font-inter font-normal text-darkcharcoal">
           Have and account?
         </p>
         <button
           type="button"
-          className="font-inter cursor-pointer font-medium uppercase text-black"
+          className="cursor-pointer font-inter font-medium uppercase text-black"
         >
           Login
         </button>
