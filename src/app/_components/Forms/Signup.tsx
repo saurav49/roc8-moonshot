@@ -30,7 +30,10 @@ function Signup() {
   return (
     <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-8  text-3xl font-semibold">Create your account</h1>
-      <form onSubmit={handleSubmit(onFormSubmit)} className="mb-12">
+      <form
+        onSubmit={handleSubmit(onFormSubmit)}
+        className="mb-12 flex w-full flex-col items-center"
+      >
         {/* Name */}
         <div className="flex w-full flex-col items-start gap-[7px]">
           <label htmlFor="name" className=" text-base font-normal text-black">
@@ -102,6 +105,7 @@ function Signup() {
         <button
           type="button"
           className="cursor-pointer  font-medium uppercase text-black"
+          onClick={() => router.push("/login")}
         >
           Login
         </button>
