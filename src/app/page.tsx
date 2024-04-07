@@ -1,4 +1,4 @@
-import { Signup, Banner, NavInfo, Navbar } from "./_components";
+import { Signup, Banner, NavInfo, Navbar, Login } from "./_components";
 
 export default async function Home() {
   return (
@@ -6,6 +6,7 @@ export default async function Home() {
       <NavInfo />
       <Navbar />
       <Banner msg={"Get 10% off on business sign up"} />
+      <Login />
       <Signup />
     </main>
   );
