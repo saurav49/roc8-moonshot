@@ -5,9 +5,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupFormSchema } from "~/lib/schema";
 import { type z } from "zod";
+import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 
 export type SingupFormFields = z.infer<typeof signupFormSchema>;
 function Signup() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -15,9 +18,15 @@ function Signup() {
   } = useForm<SingupFormFields>({
     resolver: zodResolver(signupFormSchema),
   });
+  const { mutate, isSuccess } = api.user.signup.useMutation();
   const onFormSubmit: SubmitHandler<SingupFormFields> = (data) => {
-    console.log(data);
+    mutate(data);
   };
+  React.useEffect(() => {
+    if (isSuccess) {
+      router.push("/register/otp");
+    }
+  }, [isSuccess, router]);
   return (
     <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-8 font-inter text-3xl font-semibold">
