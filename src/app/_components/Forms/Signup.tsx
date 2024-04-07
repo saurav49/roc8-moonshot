@@ -29,23 +29,18 @@ function Signup() {
   }, [isSuccess, router]);
   return (
     <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
-      <h1 className="mb-8 font-inter text-3xl font-semibold">
-        Create your account
-      </h1>
+      <h1 className="mb-8  text-3xl font-semibold">Create your account</h1>
       <form onSubmit={handleSubmit(onFormSubmit)} className="mb-12">
         {/* Name */}
         <div className="flex w-full flex-col items-start gap-[7px]">
-          <label
-            htmlFor="name"
-            className="font-inter text-base font-normal text-black"
-          >
+          <label htmlFor="name" className=" text-base font-normal text-black">
             Name
           </label>
           <input
             type="text"
             id="name"
             placeholder="Enter name"
-            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
+            className="placeholder: w-full rounded-md border border-gray p-4"
             {...register("name")}
           />
           {errors.name && (
@@ -56,17 +51,14 @@ function Signup() {
         </div>
         {/* Email */}
         <div className="my-8 flex w-full flex-col items-start gap-[7px]">
-          <label
-            htmlFor="email"
-            className="font-inter text-base font-normal text-black"
-          >
+          <label htmlFor="email" className=" text-base font-normal text-black">
             Email
           </label>
           <input
             type="email"
             id="email"
             placeholder="Enter email"
-            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
+            className="placeholder: w-full rounded-md border border-gray p-4"
             {...register("email")}
           />
           {errors.email && (
@@ -79,7 +71,7 @@ function Signup() {
         <div className="flex w-full flex-col items-start gap-[7px]">
           <label
             htmlFor="password"
-            className="font-inter text-base font-normal text-black"
+            className=" text-base font-normal text-black"
           >
             Password
           </label>
@@ -87,7 +79,7 @@ function Signup() {
             type="password"
             id="password"
             placeholder="Enter password"
-            className="w-full rounded-md border border-gray p-4 placeholder:font-inter"
+            className="placeholder: w-full rounded-md border border-gray p-4"
             {...register("password")}
           />
           {errors.password && (
@@ -98,18 +90,18 @@ function Signup() {
         </div>
         <button
           type="submit"
-          className="mt-10 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center font-inter text-base font-medium uppercase text-white"
+          className="mt-10 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center  text-base font-medium uppercase text-white"
         >
           {isSubmitting ? <span>Loading...</span> : <span>Create account</span>}
         </button>
       </form>
       <div className="flex items-center text-base">
-        <p className="mr-[11px] font-inter font-normal text-darkcharcoal">
+        <p className="mr-[11px]  font-normal text-darkcharcoal">
           Have and account?
         </p>
         <button
           type="button"
-          className="cursor-pointer font-inter font-medium uppercase text-black"
+          className="cursor-pointer  font-medium uppercase text-black"
         >
           Login
         </button>

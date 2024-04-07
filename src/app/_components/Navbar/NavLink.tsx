@@ -6,7 +6,7 @@ function NavLink({ navLinks }: { navLinks: NavLinksType }) {
       {navLinks.links.map((navInfo) => {
         return (
           <li
-            className="font-inter mx-8 text-base font-semibold text-black"
+            className=" mx-8 text-base font-semibold text-black"
             key={`${navInfo.name}-${navInfo.link}`}
           >
             {navInfo.name}

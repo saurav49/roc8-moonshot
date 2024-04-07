@@ -5,7 +5,7 @@ import { cn } from "~/lib/utils";
 
 function Otp({ message, email }: { message: string; email: string }) {
   return (
-    <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+    <div className="flex h-[453px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-8 text-3xl font-semibold">Verify your email</h1>
       <div className="flex flex-col items-center">
         <span className="text-base font-normal">{message}</span>
@@ -27,7 +27,7 @@ function Otp({ message, email }: { message: string; email: string }) {
         />
         <button
           type="submit"
-          className="mt-16 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center font-inter text-base font-medium uppercase text-white"
+          className="mt-16 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center  text-base font-medium uppercase text-white"
         >
           {false ? <span>Loading...</span> : <span>verify</span>}
         </button>

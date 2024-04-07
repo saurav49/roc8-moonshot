@@ -25,7 +25,7 @@ function NavInfo() {
         {navLinks.links.map((navInfo) => {
           return (
             <li
-              className="font-inter mx-5 text-xs font-normal text-black"
+              className=" mx-5 text-xs font-normal text-black"
               key={`${navInfo.name}-${navInfo.link}`}
             >
               {navInfo.name}

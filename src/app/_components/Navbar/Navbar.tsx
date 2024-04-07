@@ -37,7 +37,7 @@ const navLinks: NavLinksType = {
 function Navbar() {
   return (
     <nav className="flex w-screen items-center justify-between px-10 py-4">
-      <h1 className="font-inter text-4xl font-bold">ECOMMERCE</h1>
+      <h1 className=" text-4xl font-bold">ECOMMERCE</h1>
       <NavLink navLinks={navLinks} />
       <div className="flex items-center">
         <button className="cursor-pointer">
