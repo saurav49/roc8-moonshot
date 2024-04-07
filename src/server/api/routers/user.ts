@@ -2,6 +2,24 @@ import { z } from "zod";
 import { loginFormSchema, signupFormSchema } from "~/lib/schema";
 import * as bcrypt from "bcrypt";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { sendEmail } from "~/app/_actions";
+import jwt from "jsonwebtoken";
+
+export type JwtPayload = {
+  email: string;
+};
+const generateAccessToken = (payload: JwtPayload) => {
+  const token = jwt.sign(payload, process.env.JWT_ACCESS_KEY ?? "", {
+    expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+  });
+  return token;
+};
+const generateRefreshToken = (payload: JwtPayload) => {
+  const token = jwt.sign(payload, process.env.JWT_REFRESH_KEY ?? "", {
+    expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN ?? "7d",
+  });
+  return token;
+};
 
 export const userRouter = createTRPCRouter({
   signup: publicProcedure
@@ -14,12 +32,13 @@ export const userRouter = createTRPCRouter({
         }
         return otp;
       };
-      let otp = generateOtp(8);
+      const ogOtp = generateOtp(8);
+      let otp = ogOtp;
       const salt = await bcrypt.genSalt();
       otp = await bcrypt.hash(otp.toString(), salt);
       let password = input.password;
       password = await bcrypt.hash(password, salt);
-      return ctx.db.user.create({
+      const r = await ctx.db.user.create({
         data: {
           name: input.name,
           email: input.email,
@@ -28,6 +47,13 @@ export const userRouter = createTRPCRouter({
           isVerify: false,
         },
       });
+      if (r.id) {
+        await sendEmail({ name: input.name, email: input.email, otp: ogOtp });
+        return {
+          success: true,
+          data: r,
+        };
+      }
     }),
   verify: publicProcedure
     .input(
@@ -55,7 +81,9 @@ export const userRouter = createTRPCRouter({
       if (!isMatch) {
         throw new Error("Invalid otp");
       }
-      return ctx.db.user.update({
+      const accessToken = generateAccessToken({ email: user.email });
+      const refreshToken = generateRefreshToken({ email: user.email });
+      await ctx.db.user.update({
         where: {
           email: email,
         },
@@ -64,6 +92,13 @@ export const userRouter = createTRPCRouter({
           otp: null,
         },
       });
+      return {
+        success: true,
+        data: {
+          accessToken,
+          refreshToken,
+        },
+      };
     }),
   login: publicProcedure
     .input(loginFormSchema)
@@ -77,16 +112,30 @@ export const userRouter = createTRPCRouter({
       if (!user) {
         throw new Error("User not found");
       }
+      if (!user.isVerify) {
+        throw new Error("User not verified");
+      }
       const password = user.password;
       const isMatch = await bcrypt.compare(input.password, password);
       if (!isMatch) {
-        throw new Error("Invalid otp");
+        throw new Error("Invalid password");
       }
+      const accessToken = generateAccessToken({ email: user.email });
+      const refreshToken = generateRefreshToken({ email: user.email });
       return {
         success: true,
         data: {
           email,
+          accessToken,
+          refreshToken,
         },
       };
     }),
+  delete: publicProcedure.mutation(async ({ ctx }) => {
+    await ctx.db.user.delete({
+      where: {
+        email: "biswassaurav71@gmail.com",
+      },
+    });
+  }),
 });

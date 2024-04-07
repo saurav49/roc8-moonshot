@@ -6,11 +6,14 @@ import type { SubmitHandler } from "react-hook-form";
 import { loginFormSchema } from "~/lib/schema";
 import { type z } from "zod";
 import { useRouter } from "next/navigation";
-
+import { api } from "~/trpc/react";
+import { Toaster, toast } from "sonner";
+import { handleStorecookies } from "~/lib/utils";
 export type LoginFormFields = z.infer<typeof loginFormSchema>;
 
 function Login() {
   const router = useRouter();
+  const { mutate, isSuccess, data, isPending } = api.user.login.useMutation();
   const {
     register,
     handleSubmit,
@@ -18,12 +21,22 @@ function Login() {
   } = useForm<LoginFormFields>({
     resolver: zodResolver(loginFormSchema),
   });
+  React.useEffect(() => {
+    if (isSuccess && data?.success && data.data) {
+      toast("Please wait while we redirect you to dashboard!");
+      handleStorecookies(data.data.accessToken, data.data.refreshToken);
+      setTimeout(() => {
+        router.push("/category");
+      }, 1000);
+    }
+  }, [data?.success, data?.data, router, isSuccess]);
   const onFormSubmit: SubmitHandler<LoginFormFields> = (data) => {
-    console.log(data);
+    mutate({ email: data.email, password: data.password });
   };
   const [isShowPass, setIsShowPass] = React.useState<boolean>(false);
   return (
     <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+      <Toaster closeButton />
       <h1 className="mb-8  text-3xl font-semibold text-black">Login</h1>
       <h2 className=" text-2xl font-medium text-black">
         Welcome back to ECOMMERCE
@@ -85,7 +98,11 @@ function Login() {
           type="submit"
           className="mt-10 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center text-base font-medium uppercase text-white"
         >
-          {isSubmitting ? <span>Loading...</span> : <span>login</span>}
+          {isSubmitting || isPending ? (
+            <span>Loading...</span>
+          ) : (
+            <span>login</span>
+          )}
         </button>
       </form>
       <div className="mb-[31px] mt-[29px] h-[1.5px] w-full bg-gray/70"></div>

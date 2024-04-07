@@ -7,6 +7,7 @@ import { signupFormSchema } from "~/lib/schema";
 import { type z } from "zod";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
+// import { sendEmail } from "~/app/_actions";
 
 export type SingupFormFields = z.infer<typeof signupFormSchema>;
 function Signup() {
@@ -18,15 +19,25 @@ function Signup() {
   } = useForm<SingupFormFields>({
     resolver: zodResolver(signupFormSchema),
   });
-  const { mutate, isSuccess } = api.user.signup.useMutation();
+  const { mutate, isSuccess, data, isPending } = api.user.signup.useMutation();
+  // const { mutate, isSuccess, data, isPending } = api.user.delete.useMutation();
   const onFormSubmit: SubmitHandler<SingupFormFields> = (data) => {
+    // mutate();
+    // void (async function () {
+    //   const r = await sendEmail({
+    //     name: "alex",
+    //     email: "sauravpunk49@gmail.com",
+    //     otp: "12345678",
+    //   });
+    //   console.log(r);
+    // })();
     mutate(data);
   };
   React.useEffect(() => {
-    if (isSuccess) {
-      router.push("/register/otp");
+    if (isSuccess && data?.success) {
+      router.push(`/otp?email=${data.data.email}`);
     }
-  }, [isSuccess, router]);
+  }, [data, isSuccess, router]);
   return (
     <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-8  text-3xl font-semibold">Create your account</h1>
@@ -93,9 +104,13 @@ function Signup() {
         </div>
         <button
           type="submit"
-          className="mt-10 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center  text-base font-medium uppercase text-white"
+          className="mt-10 w-full rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center  text-base font-medium uppercase text-white"
         >
-          {isSubmitting ? <span>Loading...</span> : <span>Create account</span>}
+          {isSubmitting || isPending ? (
+            <span>Loading...</span>
+          ) : (
+            <span>Create account</span>
+          )}
         </button>
       </form>
       <div className="flex items-center text-base">

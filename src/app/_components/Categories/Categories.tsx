@@ -23,7 +23,7 @@ function Categories({
   console.log({ categories, totalPages });
   return (
     <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
-      <h1 className="mb-8  text-3xl font-semibold text-black">
+      <h1 className="mb-2 text-3xl font-semibold text-black">
         Please mark your interests!
       </h1>
       <p className="mb-[31px] mt-[13px]  text-base font-normal text-black">
