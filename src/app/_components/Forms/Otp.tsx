@@ -15,7 +15,7 @@ function Otp({ message, email }: { message: string; email: string }) {
       toast("User verfied successfully");
       handleStorecookies(data.data.accessToken, data.data.refreshToken);
       setTimeout(() => {
-        router.push("/category");
+        router.push(`/category?page=${1}`, { scroll: false });
       }, 1000);
     }
   }, [data?.data, data?.success, isSuccess, router]);

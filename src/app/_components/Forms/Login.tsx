@@ -26,7 +26,7 @@ function Login() {
       toast("Please wait while we redirect you to dashboard!");
       handleStorecookies(data.data.accessToken, data.data.refreshToken);
       setTimeout(() => {
-        router.push("/category");
+        router.push(`/category?page=${1}`, { scroll: false });
       }, 1000);
     }
   }, [data?.success, data?.data, router, isSuccess]);

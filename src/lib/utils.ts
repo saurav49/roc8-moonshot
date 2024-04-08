@@ -23,3 +23,5 @@ export const handleStorecookies = (
   localStorage.setItem("access_token", accessToken);
   localStorage.setItem("refresh_token", refreshToken);
 };
+
+export const PAGE_SIZE = 5;

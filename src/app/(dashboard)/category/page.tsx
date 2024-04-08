@@ -12,6 +12,7 @@ const CategoryPage = async ({
     <Categories
       categories={success ? data.categories : []}
       totalPages={success ? data.totalPages : 0}
+      currentPage={success ? data.currentPage : 0}
     />
   );
 };

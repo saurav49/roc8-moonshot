@@ -1,6 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
-export const PAGE_SIZE = 5;
+import { PAGE_SIZE } from "~/lib/utils";
+
 export const categoryRouter = createTRPCRouter({
   getAllCategory: publicProcedure
     .input(
@@ -19,6 +20,7 @@ export const categoryRouter = createTRPCRouter({
         data: {
           categories,
           totalPages,
+          currentPage: input.pageNumber,
         },
       };
     }),
