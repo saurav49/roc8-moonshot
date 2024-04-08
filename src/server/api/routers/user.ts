@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { loginFormSchema, signupFormSchema } from "~/lib/schema";
+import {
+  addCategorySchema,
+  loginFormSchema,
+  signupFormSchema,
+} from "~/lib/schema";
 import * as bcrypt from "bcrypt";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { sendEmail } from "~/app/_actions";
@@ -108,6 +112,9 @@ export const userRouter = createTRPCRouter({
         where: {
           email,
         },
+        include: {
+          categories: true,
+        },
       });
       if (!user) {
         throw new Error("User not found");
@@ -125,10 +132,35 @@ export const userRouter = createTRPCRouter({
       return {
         success: true,
         data: {
-          email,
+          ...user,
           accessToken,
           refreshToken,
         },
+      };
+    }),
+  getLikedCategoriesByEmail: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const email = input.email;
+      console.log(email, input);
+      const user = await ctx.db.user.findUnique({
+        where: {
+          email,
+        },
+        include: {
+          categories: true,
+        },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return {
+        success: true,
+        data: user.categories,
       };
     }),
   delete: publicProcedure.mutation(async ({ ctx }) => {
@@ -138,4 +170,74 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+  likeCategory: publicProcedure
+    .input(addCategorySchema)
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          email: input.email,
+        },
+      });
+      const category = await ctx.db.category.findUnique({
+        where: {
+          id: input.category.id,
+        },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      if (!user.isVerify) {
+        throw new Error("User not verified");
+      }
+      if (!category) {
+        throw new Error("Category not found");
+      }
+      return await ctx.db.user.update({
+        where: {
+          email: input.email,
+        },
+        data: {
+          categories: {
+            connect: {
+              id: input.category.id,
+            },
+          },
+        },
+      });
+    }),
+  unlikeCategory: publicProcedure
+    .input(addCategorySchema)
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          email: input.email,
+        },
+      });
+      const category = await ctx.db.category.findUnique({
+        where: {
+          id: input.category.id,
+        },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      if (!user.isVerify) {
+        throw new Error("User not verified");
+      }
+      if (!category) {
+        throw new Error("Category not found");
+      }
+      return await ctx.db.user.update({
+        where: {
+          email: input.email,
+        },
+        data: {
+          categories: {
+            disconnect: {
+              id: input.category.id,
+            },
+          },
+        },
+      });
+    }),
 });

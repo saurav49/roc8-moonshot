@@ -8,6 +8,16 @@ import {
 import { PAGE_SIZE } from "~/lib/utils";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
+
+export type CheckedCategoriesType = Record<
+  string,
+  {
+    id: string;
+    name: string;
+  }
+>;
+
 function Categories({
   categories,
   totalPages,
@@ -20,6 +30,46 @@ function Categories({
   totalPages: number;
   currentPage: number;
 }) {
+  const { data, isSuccess, isLoading, refetch } =
+    api.user.getLikedCategoriesByEmail.useQuery(
+      {
+        email: "biswassaurav71@gmail.com",
+      },
+      {
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+      },
+    );
+  const likeCategory = api.user.likeCategory.useMutation({
+    onSettled: () => {
+      void refetch();
+    },
+  });
+  const unlikeCategory = api.user.unlikeCategory.useMutation({
+    onSettled: () => {
+      void refetch();
+    },
+  });
+  const [checkedCategories, setCheckedCategories] =
+    React.useState<null | CheckedCategoriesType>(null);
+  React.useEffect(() => {
+    if (
+      isSuccess &&
+      !isLoading &&
+      data?.success &&
+      data?.data &&
+      Array.isArray(data.data) &&
+      data.data.length > 0
+    ) {
+      const cat = data.data.reduce((acc: CheckedCategoriesType, obj) => {
+        acc[obj.name] = { id: obj.id, name: obj.name };
+        return acc;
+      }, {});
+      setCheckedCategories(() => cat);
+      return;
+    }
+    setCheckedCategories(null);
+  }, [data?.data, data?.success, isLoading, isSuccess]);
   const router = useRouter();
   const [pageNo, setPageNo] = React.useState<number>(0);
   React.useEffect(() => {
@@ -57,40 +107,35 @@ function Categories({
       </li>
     ) : null;
   });
-  // const handlePrevEllipsisBtnClick = () => {
-  //   if (pageNo - 1 >= minPageLimit) {
-  //     setMaxPageLimit((prevState) => prevState - 1);
-  //     setMinPageLimit((prevState) => prevState - 1);
-  //     setPageNo(pageNo - 1);
-  //   }
-  // };
-  // const handleNextEllipsisBtnClick = () => {
-  //   if (pageNo + 1 < totalPages) {
-  //     setMaxPageLimit((prevState) => prevState + 1);
-  //     setMinPageLimit((prevState) => prevState + 1);
-  //     setPageNo(pageNo + 1);
-  //   }
-  // };
-  // let pageIncrementEllipsis = null;
-  // if (pages.length > maxPageLimit) {
-  //   pageIncrementEllipsis = (
-  //     <PaginationItem className="flex items-center justify-center">
-  //       <button type="button" onClick={() => handleNextEllipsisBtnClick()}>
-  //         <ChevronRight />
-  //       </button>
-  //     </PaginationItem>
-  //   );
-  // }
-  // let pageDecrementEllipsis = null;
-  // if (minPageLimit >= 1) {
-  //   pageDecrementEllipsis = (
-  //     <PaginationItem className="flex items-center justify-center">
-  //       <button type="button" onClick={() => handlePrevEllipsisBtnClick()}>
-  //         <ChevronLeft />
-  //       </button>
-  //     </PaginationItem>
-  //   );
-  // }
+  const handleCheckbox = (data: { id: string; name: string }) => {
+    const isChecked = checkedCategories
+      ? !!checkedCategories[data.name]?.name
+      : false;
+    setCheckedCategories((prevState) => {
+      if (prevState && isChecked) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [data.name]: _, ...updatedObj } = prevState;
+        return updatedObj;
+      } else {
+        return { ...prevState, [data.name]: { ...data } };
+      }
+    });
+    if (isChecked) {
+      unlikeCategory.mutate({
+        email: "biswassaurav71@gmail.com",
+        category: {
+          id: data.id,
+        },
+      });
+    } else {
+      likeCategory.mutate({
+        email: "biswassaurav71@gmail.com",
+        category: {
+          id: data.id,
+        },
+      });
+    }
+  };
   return (
     <div className="flex h-[579px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-2 text-3xl font-semibold text-black">
@@ -112,8 +157,12 @@ function Categories({
                 type="checkbox"
                 name={data.name}
                 id={data.name}
-                // checked={checked}
-                // onChange={() => checkboxHandler(pageIndex)}
+                checked={
+                  checkedCategories
+                    ? checkedCategories[data.name]?.name === data.name
+                    : false
+                }
+                onChange={() => handleCheckbox(data)}
                 className="peer flex h-[23px] w-[23px] shrink-0 cursor-pointer appearance-none items-center justify-center
                           rounded-md border border-[#cccccc] bg-[#cccccc]
                           outline-none checked:bg-black
@@ -131,7 +180,7 @@ function Categories({
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
+                strokeWidth="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
@@ -158,9 +207,7 @@ function Categories({
                 <ChevronsLeft />
               </button>
             </PaginationItem>
-            {/* {pageDecrementEllipsis} */}
             {pages}
-            {/* {pageIncrementEllipsis} */}
             <PaginationItem className="flex items-center justify-center">
               <button type="button" onClick={() => handleNextBtnClick()}>
                 <ChevronsRight />

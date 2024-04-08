@@ -8,3 +8,10 @@ export const signupFormSchema = z.object({
   email: z.string().email(),
   password: z.string().min(4).max(20),
 });
+export const categorySchema = z.object({
+  id: z.string(),
+});
+export const addCategorySchema = z.object({
+  email: z.string().email(),
+  category: categorySchema,
+});
