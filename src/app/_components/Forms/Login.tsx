@@ -35,7 +35,7 @@ function Login() {
   };
   const [isShowPass, setIsShowPass] = React.useState<boolean>(false);
   return (
-    <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+    <div className="flex h-[576px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <Toaster closeButton />
       <h1 className="mb-8  text-3xl font-semibold text-black">Login</h1>
       <h2 className=" text-2xl font-medium text-black">

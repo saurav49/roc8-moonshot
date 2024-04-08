@@ -5,11 +5,15 @@ const CategoryPage = async ({
 }: {
   searchParams: { page: string };
 }) => {
-  const categories = await api.category.getAllCategory({
+  const { success, data } = await api.category.getAllCategory({
     pageNumber: searchParams.page ? Number(searchParams.page) : 1,
   });
-  const totalPages = await api.category.getTotalPages();
-  return <Categories categories={categories} totalPages={totalPages} />;
+  return (
+    <Categories
+      categories={success ? data.categories : []}
+      totalPages={success ? data.totalPages : 0}
+    />
+  );
 };
 
 export default CategoryPage;

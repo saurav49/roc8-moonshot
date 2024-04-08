@@ -39,7 +39,7 @@ function Signup() {
     }
   }, [data, isSuccess, router]);
   return (
-    <div className="flex h-[691px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+    <div className="flex h-[576px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-8  text-3xl font-semibold">Create your account</h1>
       <form
         onSubmit={handleSubmit(onFormSubmit)}
