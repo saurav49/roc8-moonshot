@@ -5,10 +5,11 @@ import {
   PaginationContent,
   PaginationItem,
 } from "~/app/_components";
-import { PAGE_SIZE } from "~/lib/utils";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
+import { useAppStore } from "~/lib/store";
+import { PAGE_SIZE } from "~/server/api/routers/category";
 
 export type CheckedCategoriesType = Record<
   string,
@@ -30,10 +31,11 @@ function Categories({
   totalPages: number;
   currentPage: number;
 }) {
+  const { userDetails } = useAppStore();
   const { data, isSuccess, isLoading, refetch } =
     api.user.getLikedCategoriesByEmail.useQuery(
       {
-        email: "biswassaurav71@gmail.com",
+        email: userDetails.email ? userDetails.email : "",
       },
       {
         refetchOnMount: false,
@@ -122,14 +124,14 @@ function Categories({
     });
     if (isChecked) {
       unlikeCategory.mutate({
-        email: "biswassaurav71@gmail.com",
+        email: userDetails.email ? userDetails.email : "",
         category: {
           id: data.id,
         },
       });
     } else {
       likeCategory.mutate({
-        email: "biswassaurav71@gmail.com",
+        email: userDetails.email ? userDetails.email : "",
         category: {
           id: data.id,
         },
@@ -181,8 +183,8 @@ function Categories({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="M20 6 9 17l-5-5" stroke={true ? "#fff" : "#878787"} />
               </svg>
@@ -220,4 +222,4 @@ function Categories({
   );
 }
 
-export { Categories };
+export default Categories;

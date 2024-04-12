@@ -8,6 +8,8 @@ import * as bcrypt from "bcrypt";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { sendEmail } from "~/app/_actions";
 import jwt from "jsonwebtoken";
+import { isLoggedIn } from "~/server/middleware/user";
+import { TRPCError } from "@trpc/server";
 
 export type JwtPayload = {
   email: string;
@@ -239,5 +241,27 @@ export const userRouter = createTRPCRouter({
           },
         },
       });
+    }),
+  me: publicProcedure
+    .use(isLoggedIn)
+    .output(
+      z.object({
+        email: z.string().email(),
+      }),
+    )
+    .query(async ({ ctx }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          email: ctx.user?.email,
+        },
+      });
+      if (!user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      return {
+        success: true,
+        email: user.email,
+        name: user.name,
+      };
     }),
 });

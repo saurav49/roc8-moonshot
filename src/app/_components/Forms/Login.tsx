@@ -9,9 +9,11 @@ import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import { Toaster, toast } from "sonner";
 import { handleStorecookies } from "~/lib/utils";
+import { useAppStore } from "~/lib/store";
 export type LoginFormFields = z.infer<typeof loginFormSchema>;
 
 function Login() {
+  const { setUserDetails } = useAppStore();
   const router = useRouter();
   const { mutate, isSuccess, data, isPending } = api.user.login.useMutation();
   const {
@@ -22,14 +24,19 @@ function Login() {
     resolver: zodResolver(loginFormSchema),
   });
   React.useEffect(() => {
-    if (isSuccess && data?.success && data.data) {
+    if (isSuccess && data?.success && data?.data) {
       toast("Please wait while we redirect you to dashboard!");
       handleStorecookies(data.data.accessToken, data.data.refreshToken);
+      setUserDetails({
+        id: data.data.id,
+        name: data.data.name,
+        email: data.data.email,
+      });
       setTimeout(() => {
         router.push(`/category?page=${1}`, { scroll: false });
       }, 1000);
     }
-  }, [data?.success, data?.data, router, isSuccess]);
+  }, [data?.success, data?.data, router, isSuccess, setUserDetails]);
   const onFormSubmit: SubmitHandler<LoginFormFields> = (data) => {
     mutate({ email: data.email, password: data.password });
   };

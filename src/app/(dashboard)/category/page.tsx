@@ -1,4 +1,4 @@
-import { Categories } from "~/app/_components";
+import Categories from "~/app/_components/Categories/Categories";
 import { api } from "~/trpc/server";
 const CategoryPage = async ({
   searchParams,
