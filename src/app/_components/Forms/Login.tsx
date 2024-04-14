@@ -38,7 +38,7 @@ function Login() {
         email: data.data.email,
       });
       setTimeout(() => {
-        router.push(`/category?page=${1}`, { scroll: false });
+        router.push(`/?page=${1}`, { scroll: false });
       }, 1000);
     }
     if (error?.message) {

@@ -32,22 +32,12 @@ function Categories({
   totalPages: number;
   currentPage: number;
 }) {
-  // const email = getCookie("email");
-  // const { email } = parseCookies();
-  // const { userDetails } = useAppStore();
+  console.log({ categories, totalPages, currentPage });
   const { data, isSuccess, isLoading, refetch } =
     api.user.getLikedCategoriesByEmail.useQuery(undefined, {
       refetchOnMount: false,
       refetchOnReconnect: false,
     });
-  // {
-  //   // email: email ?? "",
-  //   // email: "biswassaurav71@gmail.com",
-  // },
-  // {
-  //   refetchOnMount: false,
-  //   refetchOnReconnect: false,
-  // },
   const likeCategory = api.user.likeCategory.useMutation({
     onSettled: () => {
       void refetch();
@@ -91,7 +81,7 @@ function Categories({
       setMaxPageLimit(maxPageLimit + PAGE_SIZE);
     }
     setPageNo((prevState) => prevState + 1);
-    router.push(`/category?page=${pageNo + 1}`, { scroll: false });
+    router.push(`/?page=${pageNo + 1}`, { scroll: false });
   };
   const handlePrevBtnClick = () => {
     if ((pageNo - 1) % PAGE_SIZE === 0) {
@@ -99,7 +89,7 @@ function Categories({
       setMaxPageLimit(maxPageLimit - PAGE_SIZE);
     }
     setPageNo((prevState) => prevState - 1);
-    router.push(`/category?page=${pageNo - 1}`, { scroll: false });
+    router.push(`/?page=${pageNo - 1}`, { scroll: false });
   };
   const pages = Array.from(Array(totalPages + 1).keys()).map((ele) => {
     return ele <= maxPageLimit && ele > minPageLimit ? (
@@ -108,14 +98,13 @@ function Categories({
         key={ele}
         onClick={() => {
           setPageNo(ele);
-          router.push(`/category?page=${ele}`, { scroll: false });
+          router.push(`/?page=${ele}`, { scroll: false });
         }}
       >
         {ele}
       </li>
     ) : null;
   });
-  console.log(pages);
   const handleCheckbox = (data: { id: string; name: string }) => {
     const isChecked = checkedCategories
       ? !!checkedCategories[data.name]?.name
@@ -131,14 +120,12 @@ function Categories({
     });
     if (isChecked) {
       unlikeCategory.mutate({
-        // email: userDetails.email ? userDetails.email : "",
         category: {
           id: data.id,
         },
       });
     } else {
       likeCategory.mutate({
-        // email: userDetails.email ? userDetails.email : "",
         category: {
           id: data.id,
         },

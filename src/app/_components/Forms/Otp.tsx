@@ -18,7 +18,7 @@ function Otp({ message, email }: { message: string; email: string }) {
         cookieValue: data.data.accessToken,
       });
       setTimeout(() => {
-        router.push(`/category?page=${1}`, { scroll: false });
+        router.push(`/?page=${1}`, { scroll: false });
       }, 1000);
     }
   }, [data?.data, data?.success, isSuccess, router]);

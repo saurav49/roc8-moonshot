@@ -9,13 +9,11 @@ export const LogButton = ({ btnText }: { btnText: string }) => {
   const router = useRouter();
   return (
     <>
-      {pathname.includes("/category") ? (
+      {pathname.includes("/") ? (
         <button
           onClick={() => {
             deleteCookie("accessToken", destroyCookieOption);
             deleteCookie("email", destroyCookieOption);
-            // destroyCookie({}, "accessToken", destroyCookieOption);
-            // destroyCookie({}, "email", destroyCookieOption);
             router.push("/login");
           }}
           className="mb-[0.35rem] cursor-pointer text-xs font-normal text-black"
