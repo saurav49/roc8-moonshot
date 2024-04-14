@@ -158,13 +158,13 @@ export const userRouter = createTRPCRouter({
         data: user.categories,
       };
     }),
-  // delete: publicProcedure.mutation(async ({ ctx }) => {
-  //   await ctx.db.user.delete({
-  //     where: {
-  //       email: ctx.user?.email,
-  //     },
-  //   });
-  // }),
+  delete: publicProcedure.mutation(async ({ ctx }) => {
+    await ctx.db.user.delete({
+      where: {
+        email: "biswassaurav71@gmail.com",
+      },
+    });
+  }),
   likeCategory: publicProcedure
     .input(addCategorySchema)
     .use(isLoggedIn)

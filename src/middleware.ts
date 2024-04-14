@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   if (currentUser && request.nextUrl.pathname.startsWith("/otp")) {
     return Response.redirect(new URL("/", request.url));
   }
-  if (!currentUser && !request.nextUrl.pathname.startsWith("/login")) {
+  if (!currentUser && request.nextUrl.pathname === "/") {
     return Response.redirect(new URL("/login", request.url));
   }
 }

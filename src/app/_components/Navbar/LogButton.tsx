@@ -9,7 +9,11 @@ export const LogButton = ({ btnText }: { btnText: string }) => {
   const router = useRouter();
   return (
     <>
-      {pathname.includes("/") ? (
+      {!(
+        pathname.startsWith("/login") ||
+        pathname.startsWith("/register") ||
+        pathname.startsWith("/otp")
+      ) ? (
         <button
           onClick={() => {
             deleteCookie("accessToken", destroyCookieOption);

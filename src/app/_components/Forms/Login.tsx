@@ -15,6 +15,7 @@ export type LoginFormFields = z.infer<typeof loginFormSchema>;
 function Login() {
   const { setUserDetails } = useAppStore();
   const router = useRouter();
+  // const deleteUser = api.user.delete.useMutation();
   const { mutate, isSuccess, data, isPending, error } =
     api.user.login.useMutation();
   const {
@@ -51,6 +52,7 @@ function Login() {
   const [isShowPass, setIsShowPass] = React.useState<boolean>(false);
   return (
     <div className="flex w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+      {/* <button onClick={() => deleteUser.mutate()}>delete</button> */}
       <h1 className="mb-8  text-3xl font-semibold text-black">Login</h1>
       <h2 className=" text-2xl font-medium text-black">
         Welcome back to ECOMMERCE
