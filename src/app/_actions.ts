@@ -27,12 +27,14 @@ export async function sendEmail(data: {
     html: signupOtpEmail,
   };
 
-  transporter.sendMail(mailOptions, function (error) {
-    if (error) {
-      return false;
-    } else {
-      console.log("Email Sent");
-      return true;
-    }
+  await new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, function (error) {
+      if (error) {
+        reject(false);
+      } else {
+        console.log("Email Sent");
+        resolve(true);
+      }
+    });
   });
 }

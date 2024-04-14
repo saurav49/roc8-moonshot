@@ -161,7 +161,7 @@ export const userRouter = createTRPCRouter({
   delete: publicProcedure.mutation(async ({ ctx }) => {
     await ctx.db.user.delete({
       where: {
-        email: "biswassaurav71@gmail.com",
+        email: ctx.user?.email,
       },
     });
   }),
