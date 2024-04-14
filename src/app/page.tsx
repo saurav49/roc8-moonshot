@@ -1,4 +1,3 @@
-// "use client";
 import Categories from "~/app/_components/Categories/Categories";
 import { api } from "~/trpc/server";
 const CategoryPage = async ({

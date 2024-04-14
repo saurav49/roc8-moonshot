@@ -23,11 +23,6 @@ const handler = (req: NextRequest) =>
     onError:
       process.env.NODE_ENV === "development"
         ? ({ path, error }) => {
-            // if (error instanceof TRPCError) {
-            //   const httpCode = getHTTPStatusCodeFromError(error);
-            //   console.log({ s: httpCode });
-            //   destroyCookie(null, "accessToken", { path: "/" });
-            // }
             console.error(
               `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`,
             );

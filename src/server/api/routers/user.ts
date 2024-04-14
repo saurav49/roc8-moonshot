@@ -10,7 +10,6 @@ import { sendEmail } from "~/app/_actions";
 import jwt from "jsonwebtoken";
 import { isLoggedIn } from "~/server/middleware/user";
 import { TRPCError } from "@trpc/server";
-// import { getRefreshTokenFromCookies } from "~/lib/utils";
 
 export type JwtPayload = {
   email: string;
@@ -21,12 +20,6 @@ export const generateAccessToken = (payload: JwtPayload) => {
   });
   return token;
 };
-// export const generateRefreshToken = (payload: JwtPayload) => {
-//   const token = jwt.sign(payload, process.env.JWT_REFRESH_KEY ?? "", {
-//     expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
-//   });
-//   return token;
-// };
 
 export const userRouter = createTRPCRouter({
   signup: publicProcedure
@@ -89,7 +82,6 @@ export const userRouter = createTRPCRouter({
         throw new Error("Invalid otp");
       }
       const accessToken = generateAccessToken({ email: user.email });
-      // const refreshToken = generateRefreshToken({ email: user.email });
       await ctx.db.user.update({
         where: {
           email: email,
@@ -103,7 +95,6 @@ export const userRouter = createTRPCRouter({
         success: true,
         data: {
           accessToken,
-          // refreshToken,
         },
       };
     }),
@@ -134,13 +125,11 @@ export const userRouter = createTRPCRouter({
         });
       }
       const accessToken = generateAccessToken({ email: user.email });
-      // const refreshToken = generateRefreshToken({ email: user.email });
       return {
         success: true,
         data: {
           ...user,
           accessToken,
-          // refreshToken,
         },
       };
     }),
@@ -169,15 +158,13 @@ export const userRouter = createTRPCRouter({
         data: user.categories,
       };
     }),
-  delete: publicProcedure.mutation(async ({ ctx }) => {
-    await ctx.db.user.delete({
-      where: {
-        email: "biswassaurav71@gmail.com",
-        // email: "sauravpunk49@gmail.com",
-        // email: "kojivo3154@agaseo.com",
-      },
-    });
-  }),
+  // delete: publicProcedure.mutation(async ({ ctx }) => {
+  //   await ctx.db.user.delete({
+  //     where: {
+  //       email: ctx.user?.email,
+  //     },
+  //   });
+  // }),
   likeCategory: publicProcedure
     .input(addCategorySchema)
     .use(isLoggedIn)
@@ -287,41 +274,4 @@ export const userRouter = createTRPCRouter({
         name: user.name,
       };
     }),
-  // getRefreshToken: publicProcedure.mutation(async ({ ctx }) => {
-  //   const refreshToken = getRefreshTokenFromCookies();
-  //   if (refreshToken) {
-  //     const r = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY ?? "");
-  //     if (typeof r !== "string") {
-  //       const user = await ctx.db.user.findUnique({
-  //         where: {
-  //           email: r.email,
-  //         },
-  //       });
-  //       if (!user) {
-  //         return {
-  //           success: false,
-  //           status: 401,
-  //           error: {
-  //             message: "User not found",
-  //           },
-  //         };
-  //       }
-  //       const accessToken = generateAccessToken({ email: user.email });
-  //       // const refreshToken = generateRefreshToken({ email: user.email });
-  //       return {
-  //         success: true,
-  //         data: {
-  //           ...user,
-  //           accessToken,
-  //           // refreshToken,
-  //         },
-  //       };
-  //     }
-  //   } else {
-  //     return {
-  //       success: false,
-  //       status: 401,
-  //     };
-  //   }
-  // }),
 });

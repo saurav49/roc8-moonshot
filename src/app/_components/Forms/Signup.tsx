@@ -7,7 +7,6 @@ import { signupFormSchema } from "~/lib/schema";
 import { type z } from "zod";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
-// import { sendEmail } from "~/app/_actions";
 
 export type SingupFormFields = z.infer<typeof signupFormSchema>;
 function Signup() {
@@ -21,17 +20,7 @@ function Signup() {
     resolver: zodResolver(signupFormSchema),
   });
   const { mutate, isSuccess, data, isPending } = api.user.signup.useMutation();
-  const deleteUser = api.user.delete.useMutation();
   const onFormSubmit: SubmitHandler<SingupFormFields> = (data) => {
-    // mutate();
-    // void (async function () {
-    //   const r = await sendEmail({
-    //     name: "alex",
-    //     email: "sauravpunk49@gmail.com",
-    //     otp: "12345678",
-    //   });
-    //   console.log(r);
-    // })();
     mutate(data);
   };
   React.useEffect(() => {
@@ -41,7 +30,6 @@ function Signup() {
   }, [data, isSuccess, router]);
   return (
     <div className="flex w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
-      <button onClick={() => deleteUser.mutate()}>Delete user</button>
       <h1 className="mb-8  text-3xl font-semibold">Create your account</h1>
       <form
         onSubmit={handleSubmit(onFormSubmit)}

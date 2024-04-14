@@ -8,9 +8,8 @@ import {
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
-// import { useAppStore } from "~/lib/store";
 import { PAGE_SIZE } from "~/server/api/routers/category";
-// import { getCookie } from "cookies-next";
+import { toast } from "sonner";
 
 export type CheckedCategoriesType = Record<
   string,
@@ -32,7 +31,6 @@ function Categories({
   totalPages: number;
   currentPage: number;
 }) {
-  console.log({ categories, totalPages, currentPage });
   const { data, isSuccess, isLoading, refetch } =
     api.user.getLikedCategoriesByEmail.useQuery(undefined, {
       refetchOnMount: false,
@@ -48,6 +46,14 @@ function Categories({
       void refetch();
     },
   });
+  React.useEffect(() => {
+    if (likeCategory.isError) {
+      toast.error("Something went wrong, please try again");
+    }
+    if (unlikeCategory.isError) {
+      toast.error("Something went wrong, please try again");
+    }
+  }, [likeCategory.isError, unlikeCategory.isError]);
   const [checkedCategories, setCheckedCategories] =
     React.useState<null | CheckedCategoriesType>(null);
   React.useEffect(() => {
