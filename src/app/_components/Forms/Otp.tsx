@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 function Otp({ message, email }: { message: string; email: string }) {
   const router = useRouter();
   const [otp, setOtp] = React.useState<string>("");
-  const { mutate, isSuccess, isPending, data } = api.user.verify.useMutation();
+  const { mutate, isSuccess, isPending, data, isError, error } =
+    api.user.verify.useMutation();
   React.useEffect(() => {
     if (isSuccess && data?.success && data.data) {
       toast("User verfied successfully");
@@ -22,6 +23,11 @@ function Otp({ message, email }: { message: string; email: string }) {
       }, 1000);
     }
   }, [data?.data, data?.success, isSuccess, router]);
+  React.useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [error?.message, isError]);
   return (
     <div className="flex h-[453px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-8 text-3xl font-semibold">Verify your email</h1>
