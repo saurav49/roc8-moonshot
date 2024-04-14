@@ -7,15 +7,16 @@ import { loginFormSchema } from "~/lib/schema";
 import { type z } from "zod";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
-import { Toaster, toast } from "sonner";
-import { handleStorecookies } from "~/lib/utils";
+import { toast } from "sonner";
+import { handleStoreCookie } from "~/lib/utils";
 import { useAppStore } from "~/lib/store";
 export type LoginFormFields = z.infer<typeof loginFormSchema>;
 
 function Login() {
   const { setUserDetails } = useAppStore();
   const router = useRouter();
-  const { mutate, isSuccess, data, isPending } = api.user.login.useMutation();
+  const { mutate, isSuccess, data, isPending, error } =
+    api.user.login.useMutation();
   const {
     register,
     handleSubmit,
@@ -25,8 +26,12 @@ function Login() {
   });
   React.useEffect(() => {
     if (isSuccess && data?.success && data?.data) {
+      handleStoreCookie({ cookieKey: "email", cookieValue: data.data.email });
+      handleStoreCookie({
+        cookieKey: "accessToken",
+        cookieValue: data.data.accessToken,
+      });
       toast("Please wait while we redirect you to dashboard!");
-      handleStorecookies(data.data.accessToken, data.data.refreshToken);
       setUserDetails({
         id: data.data.id,
         name: data.data.name,
@@ -36,14 +41,16 @@ function Login() {
         router.push(`/category?page=${1}`, { scroll: false });
       }, 1000);
     }
-  }, [data?.success, data?.data, router, isSuccess, setUserDetails]);
+    if (error?.message) {
+      toast.error(error.message);
+    }
+  }, [data?.success, data?.data, router, isSuccess, setUserDetails, error]);
   const onFormSubmit: SubmitHandler<LoginFormFields> = (data) => {
     mutate({ email: data.email, password: data.password });
   };
   const [isShowPass, setIsShowPass] = React.useState<boolean>(false);
   return (
-    <div className="flex h-[576px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
-      <Toaster closeButton />
+    <div className="flex w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
       <h1 className="mb-8  text-3xl font-semibold text-black">Login</h1>
       <h2 className=" text-2xl font-medium text-black">
         Welcome back to ECOMMERCE
@@ -103,7 +110,7 @@ function Login() {
         </div>
         <button
           type="submit"
-          className="mt-10 rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center text-base font-medium uppercase text-white"
+          className="mt-10 w-full rounded-md border border-black bg-black px-[147px] py-[18.5px] text-center text-base font-medium uppercase text-white"
         >
           {isSubmitting || isPending ? (
             <span>Loading...</span>

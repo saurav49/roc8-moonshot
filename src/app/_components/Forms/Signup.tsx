@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 
 export type SingupFormFields = z.infer<typeof signupFormSchema>;
 function Signup() {
+  const [isShowPass, setIsShowPass] = React.useState<boolean>(false);
   const router = useRouter();
   const {
     register,
@@ -20,7 +21,7 @@ function Signup() {
     resolver: zodResolver(signupFormSchema),
   });
   const { mutate, isSuccess, data, isPending } = api.user.signup.useMutation();
-  // const { mutate, isSuccess, data, isPending } = api.user.delete.useMutation();
+  const deleteUser = api.user.delete.useMutation();
   const onFormSubmit: SubmitHandler<SingupFormFields> = (data) => {
     // mutate();
     // void (async function () {
@@ -39,7 +40,8 @@ function Signup() {
     }
   }, [data, isSuccess, router]);
   return (
-    <div className="flex h-[576px] w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+    <div className="flex w-full max-w-[576px] flex-col items-center rounded-md border border-gray px-[60px] py-10">
+      <button onClick={() => deleteUser.mutate()}>Delete user</button>
       <h1 className="mb-8  text-3xl font-semibold">Create your account</h1>
       <form
         onSubmit={handleSubmit(onFormSubmit)}
@@ -82,7 +84,7 @@ function Signup() {
           )}
         </div>
         {/* Password */}
-        <div className="flex w-full flex-col items-start gap-[7px]">
+        <div className="relative flex w-full flex-col items-start gap-[7px]">
           <label
             htmlFor="password"
             className=" text-base font-normal text-black"
@@ -90,12 +92,19 @@ function Signup() {
             Password
           </label>
           <input
-            type="password"
+            type={isShowPass ? "text" : "password"}
             id="password"
             placeholder="Enter password"
             className="placeholder: w-full rounded-md border border-gray p-4"
             {...register("password")}
           />
+          <button
+            className="absolute right-4 top-[46px] text-base font-normal text-black underline underline-offset-4"
+            onClick={() => setIsShowPass((prevState) => !prevState)}
+            type="button"
+          >
+            {isShowPass ? <span>Hide</span> : <span>Show</span>}
+          </button>
           {errors.password && (
             <small className="text-center text-base font-normal text-error">
               {errors.password.message}

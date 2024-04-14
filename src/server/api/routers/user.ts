@@ -10,22 +10,23 @@ import { sendEmail } from "~/app/_actions";
 import jwt from "jsonwebtoken";
 import { isLoggedIn } from "~/server/middleware/user";
 import { TRPCError } from "@trpc/server";
+// import { getRefreshTokenFromCookies } from "~/lib/utils";
 
 export type JwtPayload = {
   email: string;
 };
-const generateAccessToken = (payload: JwtPayload) => {
+export const generateAccessToken = (payload: JwtPayload) => {
   const token = jwt.sign(payload, process.env.JWT_ACCESS_KEY ?? "", {
     expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
   });
   return token;
 };
-const generateRefreshToken = (payload: JwtPayload) => {
-  const token = jwt.sign(payload, process.env.JWT_REFRESH_KEY ?? "", {
-    expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN ?? "7d",
-  });
-  return token;
-};
+// export const generateRefreshToken = (payload: JwtPayload) => {
+//   const token = jwt.sign(payload, process.env.JWT_REFRESH_KEY ?? "", {
+//     expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
+//   });
+//   return token;
+// };
 
 export const userRouter = createTRPCRouter({
   signup: publicProcedure
@@ -88,7 +89,7 @@ export const userRouter = createTRPCRouter({
         throw new Error("Invalid otp");
       }
       const accessToken = generateAccessToken({ email: user.email });
-      const refreshToken = generateRefreshToken({ email: user.email });
+      // const refreshToken = generateRefreshToken({ email: user.email });
       await ctx.db.user.update({
         where: {
           email: email,
@@ -102,7 +103,7 @@ export const userRouter = createTRPCRouter({
         success: true,
         data: {
           accessToken,
-          refreshToken,
+          // refreshToken,
         },
       };
     }),
@@ -127,28 +128,31 @@ export const userRouter = createTRPCRouter({
       const password = user.password;
       const isMatch = await bcrypt.compare(input.password, password);
       if (!isMatch) {
-        throw new Error("Invalid password");
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Invalid password",
+        });
       }
       const accessToken = generateAccessToken({ email: user.email });
-      const refreshToken = generateRefreshToken({ email: user.email });
+      // const refreshToken = generateRefreshToken({ email: user.email });
       return {
         success: true,
         data: {
           ...user,
           accessToken,
-          refreshToken,
+          // refreshToken,
         },
       };
     }),
   getLikedCategoriesByEmail: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const email = input.email;
-      console.log(email, input);
+    .use(isLoggedIn)
+    .query(async ({ ctx }) => {
+      if (!ctx.user || ctx.user.email.trim().length === 0) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      }
+      const email = ctx.user.email;
       const user = await ctx.db.user.findUnique({
         where: {
           email,
@@ -169,15 +173,23 @@ export const userRouter = createTRPCRouter({
     await ctx.db.user.delete({
       where: {
         email: "biswassaurav71@gmail.com",
+        // email: "sauravpunk49@gmail.com",
+        // email: "kojivo3154@agaseo.com",
       },
     });
   }),
   likeCategory: publicProcedure
     .input(addCategorySchema)
+    .use(isLoggedIn)
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.user || ctx.user.email.trim().length === 0) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      }
       const user = await ctx.db.user.findUnique({
         where: {
-          email: input.email,
+          email: ctx.user.email,
         },
       });
       const category = await ctx.db.category.findUnique({
@@ -196,7 +208,7 @@ export const userRouter = createTRPCRouter({
       }
       return await ctx.db.user.update({
         where: {
-          email: input.email,
+          email: ctx.user.email,
         },
         data: {
           categories: {
@@ -209,10 +221,16 @@ export const userRouter = createTRPCRouter({
     }),
   unlikeCategory: publicProcedure
     .input(addCategorySchema)
+    .use(isLoggedIn)
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.user || ctx.user.email.trim().length === 0) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      }
       const user = await ctx.db.user.findUnique({
         where: {
-          email: input.email,
+          email: ctx.user.email,
         },
       });
       const category = await ctx.db.category.findUnique({
@@ -231,7 +249,7 @@ export const userRouter = createTRPCRouter({
       }
       return await ctx.db.user.update({
         where: {
-          email: input.email,
+          email: ctx.user.email,
         },
         data: {
           categories: {
@@ -250,13 +268,18 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx }) => {
+      if (!ctx.user || ctx.user.email.trim().length === 0) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      }
       const user = await ctx.db.user.findUnique({
         where: {
-          email: ctx.user?.email,
+          email: ctx.user.email,
         },
       });
       if (!user) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
       return {
         success: true,
@@ -264,4 +287,41 @@ export const userRouter = createTRPCRouter({
         name: user.name,
       };
     }),
+  // getRefreshToken: publicProcedure.mutation(async ({ ctx }) => {
+  //   const refreshToken = getRefreshTokenFromCookies();
+  //   if (refreshToken) {
+  //     const r = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY ?? "");
+  //     if (typeof r !== "string") {
+  //       const user = await ctx.db.user.findUnique({
+  //         where: {
+  //           email: r.email,
+  //         },
+  //       });
+  //       if (!user) {
+  //         return {
+  //           success: false,
+  //           status: 401,
+  //           error: {
+  //             message: "User not found",
+  //           },
+  //         };
+  //       }
+  //       const accessToken = generateAccessToken({ email: user.email });
+  //       // const refreshToken = generateRefreshToken({ email: user.email });
+  //       return {
+  //         success: true,
+  //         data: {
+  //           ...user,
+  //           accessToken,
+  //           // refreshToken,
+  //         },
+  //       };
+  //     }
+  //   } else {
+  //     return {
+  //       success: false,
+  //       status: 401,
+  //     };
+  //   }
+  // }),
 });

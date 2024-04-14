@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
-
+import { Toaster } from "sonner";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Banner, NavInfo, Navbar } from "./_components";
 
@@ -24,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <TRPCReactProvider>
+          <Toaster position="top-center" richColors closeButton />
           <main>
             <NavInfo />
             <Navbar />

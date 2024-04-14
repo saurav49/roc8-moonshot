@@ -8,8 +8,9 @@ import {
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
-import { useAppStore } from "~/lib/store";
+// import { useAppStore } from "~/lib/store";
 import { PAGE_SIZE } from "~/server/api/routers/category";
+// import { getCookie } from "cookies-next";
 
 export type CheckedCategoriesType = Record<
   string,
@@ -31,17 +32,22 @@ function Categories({
   totalPages: number;
   currentPage: number;
 }) {
-  const { userDetails } = useAppStore();
+  // const email = getCookie("email");
+  // const { email } = parseCookies();
+  // const { userDetails } = useAppStore();
   const { data, isSuccess, isLoading, refetch } =
-    api.user.getLikedCategoriesByEmail.useQuery(
-      {
-        email: userDetails.email ? userDetails.email : "",
-      },
-      {
-        refetchOnMount: false,
-        refetchOnReconnect: false,
-      },
-    );
+    api.user.getLikedCategoriesByEmail.useQuery(undefined, {
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+    });
+  // {
+  //   // email: email ?? "",
+  //   // email: "biswassaurav71@gmail.com",
+  // },
+  // {
+  //   refetchOnMount: false,
+  //   refetchOnReconnect: false,
+  // },
   const likeCategory = api.user.likeCategory.useMutation({
     onSettled: () => {
       void refetch();
@@ -95,7 +101,7 @@ function Categories({
     setPageNo((prevState) => prevState - 1);
     router.push(`/category?page=${pageNo - 1}`, { scroll: false });
   };
-  const pages = Array.from(Array(totalPages).keys()).map((ele) => {
+  const pages = Array.from(Array(totalPages + 1).keys()).map((ele) => {
     return ele <= maxPageLimit && ele > minPageLimit ? (
       <li
         className={`mx-2 cursor-pointer text-xl font-medium ${pageNo === ele ? `text-black` : `text-[#cccccc]`}`}
@@ -109,6 +115,7 @@ function Categories({
       </li>
     ) : null;
   });
+  console.log(pages);
   const handleCheckbox = (data: { id: string; name: string }) => {
     const isChecked = checkedCategories
       ? !!checkedCategories[data.name]?.name
@@ -124,14 +131,14 @@ function Categories({
     });
     if (isChecked) {
       unlikeCategory.mutate({
-        email: userDetails.email ? userDetails.email : "",
+        // email: userDetails.email ? userDetails.email : "",
         category: {
           id: data.id,
         },
       });
     } else {
       likeCategory.mutate({
-        email: userDetails.email ? userDetails.email : "",
+        // email: userDetails.email ? userDetails.email : "",
         category: {
           id: data.id,
         },

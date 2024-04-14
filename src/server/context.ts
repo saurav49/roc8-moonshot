@@ -1,34 +1,45 @@
-import { decodeAndVerifyJwtToken } from "~/lib/utils";
-import type * as trpcNext from "@trpc/server/adapters/next";
 import { db } from "~/server/db";
-export async function createContext({
-  headers,
-  ctx,
-}: {
-  headers: Headers;
-  ctx: trpcNext.CreateNextContextOptions;
-}) {
-  async function getUserFromHeader() {
-    if (ctx.req.headers.authorization) {
-      const token = ctx.req.headers.authorization.split(" ")[1];
-      if (!token) {
-        return null;
-      }
-      const user = await decodeAndVerifyJwtToken(token);
-      if (!user) {
-        return null;
-      }
-      console.log(user);
-      return user;
-    }
-    return null;
-  }
-  const user = await getUserFromHeader();
+import jwt from "jsonwebtoken";
 
+export const decodeAndVerifyJwtToken = (
+  token: string,
+): Promise<{ email: string }> => {
+  return new Promise((resolve) => {
+    jwt.verify(token, process.env.JWT_ACCESS_KEY ?? "", (_, user) => {
+      if (user) {
+        return resolve(user as { email: string });
+      } else {
+        return resolve({
+          email: "",
+        });
+      }
+    });
+  });
+};
+
+export async function createTRPCContext({ headers }: { headers: Headers }) {
+  const tokenWithBearer = headers.get("authorization");
+  let token;
+  if (tokenWithBearer && tokenWithBearer?.length > 0) {
+    if (tokenWithBearer.split(" ").length > 0) {
+      token = tokenWithBearer.split(" ")[1];
+    }
+  }
+  async function getUserFromHeader(token: string | undefined) {
+    if (!token || token === "undefined") {
+      return null;
+    }
+    const user = await decodeAndVerifyJwtToken(token);
+    if (!user || user.email.length === 0) {
+      return null;
+    }
+    return user;
+  }
+  const user = await getUserFromHeader(token);
   return {
     db,
     headers,
     user,
   };
 }
-export type Context = Awaited<ReturnType<typeof createContext>>;
+export type ContextTRPC = Awaited<ReturnType<typeof createTRPCContext>>;

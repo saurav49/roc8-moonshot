@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const currentUser = request.cookies.get("access_token")?.value;
+  const currentUser = request.cookies.get("accessToken")?.value;
 
   if (!currentUser && request.nextUrl.pathname.startsWith("/category")) {
     return Response.redirect(new URL("/login", request.url));

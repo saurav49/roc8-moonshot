@@ -1,5 +1,6 @@
 import React from "react";
 import { type NavLinksType } from "./Navbar";
+import { LogButton } from "./LogButton";
 
 const navLinks: NavLinksType = {
   links: [
@@ -18,18 +19,23 @@ const navLinks: NavLinksType = {
   ],
 };
 
+export const LOGIN = "Login";
+
 function NavInfo() {
   return (
     <nav className="flex items-center justify-end px-8 py-3">
       <ul className="flex items-center">
         {navLinks.links.map((navInfo) => {
           return (
-            <li
-              className=" mx-5 text-xs font-normal text-black"
-              key={`${navInfo.name}-${navInfo.link}`}
-            >
-              {navInfo.name}
-            </li>
+            <div key={`${navInfo.name}-${navInfo.link}`}>
+              {navInfo.name === LOGIN ? (
+                <LogButton btnText={navInfo.name} />
+              ) : (
+                <li className="mx-4 text-xs font-normal text-black">
+                  {navInfo.name}
+                </li>
+              )}
+            </div>
           );
         })}
       </ul>

@@ -12,6 +12,6 @@ export const categorySchema = z.object({
   id: z.string(),
 });
 export const addCategorySchema = z.object({
-  email: z.string().email(),
+  // email: z.string().email(),
   category: categorySchema,
 });

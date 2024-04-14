@@ -5,8 +5,10 @@ import { loggerLink, unstable_httpBatchStreamLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { useState } from "react";
 import SuperJSON from "superjson";
+import { getAccessTokenFromCookies } from "~/lib/utils";
 
 import { type AppRouter } from "~/server/api/root";
+// import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 const createQueryClient = () => new QueryClient();
 
@@ -24,7 +26,6 @@ export const api = createTRPCReact<AppRouter>();
 
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
-
   const [trpcClient] = useState(() =>
     api.createClient({
       links: [
@@ -38,7 +39,8 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
           url: getBaseUrl() + "/api/trpc",
           headers: () => {
             const headers = new Headers();
-            headers.set("x-trpc-source", "nextjs-react");
+            const accessToken = getAccessTokenFromCookies();
+            headers.set("authorization", `Bearer ${accessToken}`);
             return headers;
           },
         }),
