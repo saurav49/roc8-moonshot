@@ -161,7 +161,7 @@ function Categories({
                 id={data.name}
                 checked={
                   checkedCategories
-                    ? checkedCategories[data.name]?.name === data.name
+                    ? checkedCategories[data.name]?.id === data.id
                     : false
                 }
                 onChange={() => handleCheckbox(data)}
